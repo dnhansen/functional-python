@@ -1,5 +1,5 @@
 ###
-# Assignments from:
+# Exercises from:
 # https://gist.github.com/oskarkv/3168ea3f8d7530ccd94c97c19aafe266
 ###
 
@@ -112,12 +112,105 @@ def interleave(*seqs):
 # truthy for the argument
 
 def every_pred(*preds):
-	
+
 	def inner_every_pred(arg):
 		bools = map(lambda pred: pred(arg), preds)
+		print(bools)
 		if False not in bools:
 			return True
 		else:
 			return False
 
 	return inner_every_pred
+
+
+### frequencies
+# Takes a sequence and counts how many times the elements appear.
+
+def frequencies(seq):
+	dic = {}
+	for x in seq:
+		if x in dic:
+			dic[x] += 1
+		else:
+			dic[x] = 1
+
+	return dic
+
+
+### flatten
+# Flattens a tree
+
+def flatten(tree):
+	flat_list = []
+	for x in tree:
+		if not type(x) == list:
+			flat_list.append(x)
+		else:
+			flat_list += flatten(x)
+
+	return flat_list
+
+
+### Partition
+# Takes arguments n, step and seq. Takes n elements from seq, wraps them in a list,
+# takes a step forward in step steps, then takes another n elements, and so on.
+
+def partition(n, step, seq):
+	partitions = []
+	length = len(seq)
+
+	for i in range(0, length-n+1, step):
+		partitions.append(seq[i:i+n])
+
+	return partitions
+
+
+### merge_with
+# Takes a function and an arbitrary number of dictionaries and merges them,
+# combining repeat elements using the given function.
+
+def merge_with(f, *dicts):
+
+	def merge_two(dict1, dict2):
+		dict_out = dict(dict1)	# Creates COPY of dict1 to avoid side effects
+		for key, val in dict2.items():
+			if key in dict_out:
+				dict_out[key] = f(dict_out[key], dict2[key])
+			else:
+				dict_out[key] = dict2[key]
+		return dict_out
+
+	return reduce(merge_two, dicts)
+
+
+### tree_seq
+# Takes a function is_branch, a function children and a tree t. Returns a list
+# of the nodes of t in depth-first order.
+
+def tree_seq(is_branch, children, t):
+	out = [t]
+
+	if is_branch(t):
+		for child in children(t):
+			out += (tree_seq(is_branch, children, child))
+
+	return out
+
+
+### memoize
+# Takes a function and memoizes it
+
+def memoize(f):
+
+	f.memory = {}
+
+	def new_f(*args):
+		if args in f.memory:
+			return f.memory[args]
+		else:
+			out = f(*args)
+			f.memory[args] = out
+			return out
+
+	return new_f
