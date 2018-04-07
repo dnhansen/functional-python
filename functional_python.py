@@ -214,3 +214,108 @@ def memoize(f):
 			return out
 
 	return new_f
+
+
+### group_by
+# Takes a function and a sequence and groups the elements by the function.
+
+def group_by(f, seq):
+	grouping = {}
+	for x in seq:
+		val = f(x)
+		if val in grouping:
+			grouping[val].append(x)
+		else:
+			grouping[val] = [x]
+
+	return grouping
+
+
+### update
+# Takes a map m, a key k, a function f, and an arbitrary number of additional
+# args. Returns a new map with the value of k replaced by f(val, args). If k
+# is not in m, creates a new entry.
+
+def update(m, k, f, *args):
+	m_new = dict(m)
+
+	if k in m:
+		val = m[k]
+		m_new[k] = f(val, *args)
+	else:
+		m_new[k] = f(*args)
+
+	return m_new
+
+
+### update_in
+# Similar to update, but takes a list of keys and updates inside nested maps
+
+def update_in(m, keys, f, *args):
+	if not type(keys) == list:
+		return update(m, keys, f, *args)
+	elif len(keys) == 1:
+		return update(m, keys[0], f, *args)
+	else:
+		m_new = dict(m)
+		key0 = keys[0]
+
+		if key0 not in m:
+			m_new[key0] = {}
+		
+		m_new[key0] = update_in(m_new[key0], keys[1:], f, *args)
+		return m_new
+
+
+### balanced
+# Takes a string and returns True iff the parentheses in the string are balanced.
+
+def balanced(s):
+	parens = list(filter(lambda c: c in '()[]{}', s))
+
+	parens_map = {')': '(',
+				  ']': '[',
+				  '}': '{'}
+
+	if parens == '':
+		return True
+	elif len(parens) % 2 != 0:
+		return False
+
+	for idx, p in enumerate(parens):
+		if p in ')]}':
+			if idx == 0:
+				return False
+			elif parens[idx-1] != parens_map[p]:
+				return False
+			else:
+				del parens[idx-1:idx+1]
+				return balanced(''.join(parens))
+
+
+### map
+
+def map(f, seq):
+	out = []
+	for x in seq:
+		out.append(f(x))
+	return out
+
+
+### filter 
+
+def filter(f, seq):
+	out = []
+	for x in seq:
+		if f(x):
+			out.append(x)
+	return out
+
+
+### reduce
+
+def reduce(f, seq):
+	out = seq[0]
+	for x in seq[1:]:
+		out = f(out, x)
+	return out
